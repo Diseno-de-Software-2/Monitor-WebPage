@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 h1 {
-  @apply font-sans text-4xl font-bold text-red-500;
+  @apply font-sans text-6xl font-bold text-red-500;
 }
 
 h2 {
-  @apply font-sans text-2xl font-bold text-blue-600 mt-5;
+  @apply font-sans text-3xl font-bold text-blue-600 mt-5;
 }
 
 h3 {
-  @apply font-sans text-xl font-bold text-black mt-5;
+  @apply font-sans text-2xl font-bold text-black mt-5;
 }

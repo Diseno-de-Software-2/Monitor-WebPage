@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import axios from 'axios'
 import SwitchBankService from './components/SwitchBankService'
-import InstanceCard from './components/InstanceCard'
+import registry from '../../API-Gateway-EduPay/routes/registry.json'
+
 function App() {
 
-  const [running, setRunning] = useState(false)
   const [consult, setConsult] = useState(true)
   const [transactions, setTransactions] = useState(true)
+
+  const services = registry.services
 
   const handleConsult = () => {
     axios.post('http://localhost:5000/switch', {
@@ -31,54 +33,60 @@ function App() {
     })
   }
 
+  const handleService = (service) => {
+    axios.post(`http://localhost:3000/switch/${service.apiName}`, {
+      url: service.url,
+      enabled: !service.enabled
+    }).catch(err => {
+      alert(err)
+    })
+  }
 
+  console.log(services)
+  console.log(Object.keys(services))
+  console.log(services['auth'].instances)
 
   return (
     <div className="App">
-      {
-        <div className='text-left'>
-          <h1>
-            EduPay
-          </h1>
-          <div>
-            <h2>
-              API Bank
-            </h2>
-            <div className='flex gap-5'>
-              <SwitchBankService estado={consult} setEstado={handleConsult} nombre={'Consultas'} />
-              <SwitchBankService estado={transactions} setEstado={handleTransactions} nombre={'Transacciones'} />
-            </div>
-          </div>
+      <div>
+        <h1>
+          EduPay
+        </h1>
+        <div>
           <h2>
-            Instancias
+            API Bank
           </h2>
-          <h3>
-            Accounts
-          </h3>
-          <h3>
-            Pay
-          </h3>
-          <h3>
-            Auth
-          </h3>
-          <h3>
-            Balance
-          </h3>
-          <h3>
-            Query
-          </h3>
+          <div className='flex gap-5'>
+            <SwitchBankService estado={consult} setEstado={handleConsult} nombre={'Consultas'} />
+            <SwitchBankService estado={transactions} setEstado={handleTransactions} nombre={'Transacciones'} />
+          </div>
         </div>
-        // (running) ? (
-
-        // ) : (
-        //   <>
-        //     <h1>
-        //       EduPay
-        //     </h1>
-        //     <button className='bg-blue-500 w-52 h-20 mt-20 text-2xl font-bold text-white rounded-xl shadow-xl hover:bg-blue-600' onClick={handleRunning}>Empezar</button>
-        //   </>
-        // )
-      }
+        <h2>
+          Instancias
+        </h2>
+        <div className='text-left text-2xl'>
+          {
+            Object.keys(services).map((service, index) => {
+              return (
+                <div key={index}>
+                  <h3>
+                    {service}
+                  </h3>
+                  <div className='flex gap-5'>
+                    {
+                      services[service].instances.map((instance, index) => {
+                        return (
+                          <SwitchBankService key={index} estado={instance.enabled} setEstado={() => handleService(instance)} nombre={'port: ' + instance.port} />
+                        )
+                      })
+                    }
+                  </div>
+                </div>
+              )
+            })
+          }
+        </div>
+      </div>
     </div>
   )
 }
